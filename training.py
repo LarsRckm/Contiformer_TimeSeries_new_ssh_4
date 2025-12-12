@@ -468,7 +468,7 @@ def run_validation(model, val_loader, device, epoch, cfg, log, save_visuals=True
 
     with torch.no_grad():
         for batch_idx, batch in enumerate(val_loader, start=1):
-            groundTruth_cpu = batch["groundTruth"]
+            groundTruth = batch["groundTruth"]
             timeSeries_noisy_original = batch["noisy_TimeSeries"]
             mask = batch["mask"]
             time_stamps_original = batch["time_stamps"]
@@ -476,16 +476,17 @@ def run_validation(model, val_loader, device, epoch, cfg, log, save_visuals=True
             div_term_cpu = batch["div_term"]
             min_value_cpu = batch["min_value"]
 
-            mask_indices = torch.where(mask[0] == True)[0]
-            timeSeries_noisy = timeSeries_noisy_original[:, mask_indices].unsqueeze(-1)
-            time_stamps = time_stamps_original[0].detach().clone()[mask_indices]
-            time_stamps = time_stamps.reshape(1, -1, 1).repeat(timeSeries_noisy.size(0), 1, 1).to(device)
-            timeSeries_noisy = torch.cat((timeSeries_noisy.to(device), time_stamps), dim=-1).float()
+            # mask_indices = torch.where(mask[0] == True)[0]
+            # timeSeries_noisy = timeSeries_noisy_original[:, mask_indices].unsqueeze(-1)
+            # time_stamps = time_stamps_original[0].detach().clone()[mask_indices]
+            # time_stamps = time_stamps.reshape(1, -1, 1).repeat(timeSeries_noisy.size(0), 1, 1).to(device)
+            # timeSeries_noisy = torch.cat((timeSeries_noisy.to(device), time_stamps), dim=-1).float()
 
-            pred_x = model(timeSeries_noisy, time_stamps_original[0])[0]
-            div_term = div_term_cpu.unsqueeze(-1).unsqueeze(-1).to(device)
-            min_value = min_value_cpu.unsqueeze(-1).unsqueeze(-1).to(device)
-            groundTruth = groundTruth_cpu.unsqueeze(-1).to(device)
+
+            pred_x = model(timeSeries_noisy_original.unsqueeze(-1), mask)[0]
+            div_term = div_term_cpu.unsqueeze(-1).unsqueeze(-1)
+            min_value = min_value_cpu.unsqueeze(-1).unsqueeze(-1)
+            groundTruth = groundTruth.unsqueeze(-1)
 
             # Inverse transform from [-1, 1] back to original scale
             pred_x = ((pred_x * 0.5) + 0.5) * div_term + min_value
@@ -503,7 +504,7 @@ def run_validation(model, val_loader, device, epoch, cfg, log, save_visuals=True
 
             if save_visuals:
                 # Denormalize time for visualization and exports (model still uses [0, 1])
-                time_scale = float(cfg.number_x_values - 1) if cfg.number_x_values > 1 else 1.0
+                time_scale = float(cfg.number_x_values) if cfg.number_x_values > 1 else 1.0
                 time_stamps_plot = time_stamps_original[0] * time_scale
 
                 fig, ax = plt.subplots(1, 1, figsize=(12, 6))
@@ -555,7 +556,7 @@ def run_validation(model, val_loader, device, epoch, cfg, log, save_visuals=True
                 torch.save({
                     'pred': pred_x,
                     'target': groundTruth,
-                    'samp': timeSeries_noisy,
+                    'samp': timeSeries_noisy_original,
                     'time_plot': time_stamps_plot,
                     'metrics': metrics,
                 }, save_path)
