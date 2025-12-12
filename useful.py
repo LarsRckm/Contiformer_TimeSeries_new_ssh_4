@@ -179,7 +179,7 @@ def remove_parts_of_graph_encoder_contiformer(x_array, number_masking_tokens, of
         end_mask = [length_x_array-offset]
         # wert = np.random.normal(loc=number_masking_tokens/10, scale=number_masking_tokens/20)
         # wert = np.clip(wert, 0, number_masking_tokens)
-        mask_width = np.random.randint(0,150+1)
+        mask_width = np.random.randint(0,(number_masking_tokens+1)//2)
         position = np.random.randint(start_mask[0], end_mask[0] - mask_width)
         start_mask.append(position)
         start_mask.sort()
