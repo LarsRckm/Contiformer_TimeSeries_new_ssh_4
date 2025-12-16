@@ -18,7 +18,7 @@ val_dir_data: ./val_data  # directory for validation tensors/data dumps
 model_name: Contiformer  # model identifier used in checkpoint filenames
 log_step: 50  # log training loss every N batches
 seed: 42  # random seed for reproducibility
-val_plot_freq: 10  # run validation/plotting every N epochs
+val_plot_freq: 5  # run validation/plotting every N epochs
 disable_tqdm: false  # hide tqdm progress bars when true
 
 # ==================== Model Architecture ====================

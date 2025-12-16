@@ -9,7 +9,7 @@ val_dir_data: ./val_data
 model_name: Contiformer
 log_step: 50
 seed: 42
-val_plot_freq: 10
+val_plot_freq: 5
 disable_tqdm: false
 d_model: 64
 d_inner: 256
@@ -23,7 +23,7 @@ zero_init_ode: true
 add_pe: false
 normalize_before: false
 atol: 0.01
-rtol: 0.01
+rtol: 0.0001
 itol_ode: 0.01
 method: euler
 dropout: 0.1
@@ -38,10 +38,10 @@ scheduler_type: cosine
 warmup_epochs: 10
 min_lr: 0.0001
 weight_l1: 1.0
-weight_grad: 0.01
-weight_smooth: 0.01
+weight_grad: 0.1
+weight_smooth: 0.05
 use_frequency_loss: false
-early_stopping: true
+early_stopping: false
 patience: 200
 min_delta: 0.0001
 y_lim_low: 10
